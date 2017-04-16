@@ -29,6 +29,7 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+	"time"
 )
 
 // historyCmd represents the history command
@@ -54,7 +55,8 @@ var historyCmd = &cobra.Command{
 		}
 		defer db.Close()
 
-		rows, err := db.Query("select url, title from urls")
+		// visit_timeが1601年からのマイクロ秒となっているのでunixtime(1701年からの秒)に変換している点に注意
+		rows, err := db.Query("select title, urls.url as url, (visits.visit_time - 11676312000000000)/1000/1000 as unixtime from visits inner join urls on visits.url = urls.id order by unixtime desc")
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -63,11 +65,14 @@ var historyCmd = &cobra.Command{
 		for rows.Next() {
 			var url string
 			var title string
-			err = rows.Scan(&url, &title)
+			var unixTime int64
+			err = rows.Scan(&url, &title, &unixTime)
 			if err != nil {
 				log.Fatal(err)
 			}
-			fmt.Println(url + "|" + title)
+			var visitAt string
+			visitAt = time.Unix(unixTime, 0).String()
+			fmt.Println(visitAt + "|" + title + "|" + url)
 		}
 		err = rows.Err()
 		if err != nil {
