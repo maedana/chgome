@@ -35,7 +35,7 @@ import (
 // historyCmd represents the history command
 var historyCmd = &cobra.Command{
 	Use:   "history",
-	Short: "標準出力にGoogle Chromeの閲覧履歴を表示",
+	Short: "Show access history for google chrome.",
 	Run: func(cmd *cobra.Command, args []string) {
 
 		// chromeが動いてるとHistoryがロックされていて読めないのでコピーする

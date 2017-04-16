@@ -61,10 +61,12 @@ func init() {
 	// Cobra supports Persistent Flags, which, if defined here,
 	// will be global for your application.
 
-	RootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.chgome.yaml)")
+	RootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.chgome/config.yaml)")
 	// Cobra also supports local flags, which will only run
 	// when this action is called directly.
 	RootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	RootCmd.PersistentFlags().StringP("history_db_path", "", os.Getenv("HOME")+"/.config/google-chrome/Default/History", "History path for google chrome")
+	viper.BindPFlag("history_db_path", RootCmd.PersistentFlags().Lookup("history_db_path"))
 }
 
 // initConfig reads in config file and ENV variables if set.
@@ -73,9 +75,18 @@ func initConfig() {
 		viper.SetConfigFile(cfgFile)
 	}
 
-	viper.SetConfigName(".chgome") // name of config file (without extension)
-	viper.AddConfigPath("$HOME")   // adding home directory as first search path
-	viper.AutomaticEnv()           // read in environment variables that match
+	var configDir = os.Getenv("HOME") + "/.chgome"
+	_, err := os.Stat(configDir)
+	if err != nil {
+		err := os.Mkdir(os.Getenv("HOME")+"/.chgome", 0775)
+		if err != nil {
+			panic(err)
+		}
+	}
+
+	viper.SetConfigName("config")             // name of config file (without extension)
+	viper.AddConfigPath("$HOME" + "/.chgome") // adding home directory as first search path
+	viper.AutomaticEnv()                      // read in environment variables that match
 
 	// If a config file is found, read it in.
 	if err := viper.ReadInConfig(); err == nil {
