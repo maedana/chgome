@@ -66,7 +66,7 @@ var historyCmd = &cobra.Command{
 			var url string
 			var title string
 			var unixTime int64
-			err = rows.Scan(&url, &title, &unixTime)
+			err = rows.Scan(&title, &url, &unixTime)
 			if err != nil {
 				log.Fatal(err)
 			}
