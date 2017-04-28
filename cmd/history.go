@@ -62,6 +62,8 @@ var historyCmd = &cobra.Command{
 		}
 		defer rows.Close()
 
+		var sep = viper.GetString("separator")
+
 		for rows.Next() {
 			var url string
 			var title string
@@ -73,7 +75,7 @@ var historyCmd = &cobra.Command{
 			}
 			var visitAt string
 			visitAt = time.Unix(unixTime, 0).String()
-			fmt.Println(visitAt + "|" + title + "|" + url + "|" + count)
+			fmt.Println(visitAt + sep + title + sep + url + sep + count)
 		}
 		err = rows.Err()
 		if err != nil {
