@@ -56,7 +56,7 @@ var historyCmd = &cobra.Command{
 		defer db.Close()
 
 		// visit_timeが1601年からのマイクロ秒となっているのでunixtime(1701年からの秒)に変換している点に注意
-		rows, err := db.Query("select title, urls.url as url, (visits.visit_time - 11676312000000000)/1000/1000 as unixtime from visits inner join urls on visits.url = urls.id order by unixtime desc")
+		rows, err := db.Query("select MAX(title) as title, MAX(urls.url) as url, MAX((visits.visit_time - 11676312000000000)/1000/1000) as unixtime, COUNT(urls.id) as count from visits inner join urls on visits.url = urls.id group by urls.url order by count desc")
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -66,13 +66,14 @@ var historyCmd = &cobra.Command{
 			var url string
 			var title string
 			var unixTime int64
-			err = rows.Scan(&title, &url, &unixTime)
+			var count string
+			err = rows.Scan(&title, &url, &unixTime, &count)
 			if err != nil {
 				log.Fatal(err)
 			}
 			var visitAt string
 			visitAt = time.Unix(unixTime, 0).String()
-			fmt.Println(visitAt + "|" + title + "|" + url)
+			fmt.Println(visitAt + "|" + title + "|" + url + "|" + count)
 		}
 		err = rows.Err()
 		if err != nil {
