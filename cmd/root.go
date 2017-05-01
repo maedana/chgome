@@ -66,7 +66,9 @@ func init() {
 	// when this action is called directly.
 	RootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 	RootCmd.PersistentFlags().StringP("history_db_path", "", os.Getenv("HOME")+"/.config/google-chrome/Default/History", "History path for google chrome")
+	RootCmd.PersistentFlags().StringP("separator", "s", "|", "Separator for results")
 	viper.BindPFlag("history_db_path", RootCmd.PersistentFlags().Lookup("history_db_path"))
+	viper.BindPFlag("separator", RootCmd.PersistentFlags().Lookup("separator"))
 }
 
 // initConfig reads in config file and ENV variables if set.
